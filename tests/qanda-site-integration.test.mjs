@@ -53,15 +53,10 @@ test('homepage counts qanda chapters and chapter page renders sibling navigation
   assert.match(article, /下一章/)
 })
 
-test('LLM index and electronic books exclude topic and legacy navigation pages', () => {
+test('LLM index excludes topic and legacy navigation pages', () => {
   const llms = read('server/routes/llms-full.txt.ts')
-  const book = read('scripts/generate-books.mjs')
 
   assert.match(llms, /item\.type !== 'legacy-index'.*item\.type !== 'topic-index'/s)
-  assert.match(book, /data\.type === "legacy-index" \|\| data\.type === "topic-index"/)
-  assert.match(book, /qanda-chapter/)
-  assert.match(book, /volumeOrder/)
-  assert.match(book, /第一卷/)
 })
 
 test('sitemap excludes legacy routes while Nuxt still prerenders the 20 source guides', () => {

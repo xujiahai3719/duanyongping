@@ -6,17 +6,11 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate",
-    "postgenerate": "DEPLOY_FROM_GENERATE=1 ./deploy.sh",
+    "postgenerate": "./deploy.sh",
     "deploy": "./deploy.sh",
-    "deploy:oss": "./scripts/deploy-oss.sh",
-    "deploy:oss:upload": "./scripts/deploy-oss.sh --upload-only",
     "preview": "nuxt preview",
     "typecheck": "nuxt typecheck",
-    "og": "node scripts/generate-og-image.mjs",
-    "book": "node scripts/generate-books.mjs",
-    "book:epub": "node scripts/generate-books.mjs --format epub",
-    "book:pdf": "node scripts/generate-books.mjs --format pdf",
-    "book:qanda": "node scripts/generate-books.mjs --only qanda"
+    "og": "node scripts/generate-og-image.mjs"
   },
   "dependencies": {
     "@nuxt/content": "latest",
@@ -27,8 +21,6 @@
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@types/qrcode": "^1.5.6",
-    "epub-gen-memory": "^1.1.2",
-    "gray-matter": "^4.0.3",
     "markdown-it": "^14.1.1",
     "puppeteer": "^25.0.2",
     "typescript": "latest"

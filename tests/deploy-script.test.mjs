@@ -40,11 +40,6 @@ function deployEnv(overrides = {}) {
   delete env.CI
   delete env.DEPLOY_GIT_REMOTE
   delete env.SKIP_DEPLOY
-  delete env.DEPLOY_OSS
-  delete env.DEPLOY_FROM_GENERATE
-  delete env.ALIYUN_OSS_BUCKET
-  delete env.ALIYUN_CLI_PROFILE
-  delete env.OSS_REGION
   return { ...env, ...overrides }
 }
 
@@ -238,48 +233,4 @@ test('root entry publishes its own project when called from another directory', 
     git(remote, 'show', 'refs/heads/main:tracked.txt'),
     'published by wrapper',
   )
-})
-
-test('root entry publishes to OSS after pushing when OSS is configured', (t) => {
-  const { repo } = createRepository(t)
-  const wrapper = path.join(repo, 'deploy.sh')
-  const pythonScript = path.join(repo, 'scripts', 'deploy.py')
-  const ossScript = path.join(repo, 'scripts', 'deploy-oss.sh')
-  mkdirSync(path.dirname(pythonScript))
-  copyFileSync(path.join(projectRoot, 'deploy.sh'), wrapper)
-  copyFileSync(deployScript, pythonScript)
-  writeFileSync(ossScript, '#!/bin/sh\nprintf called > oss-invocation.txt\n')
-  chmodSync(wrapper, 0o755)
-  chmodSync(ossScript, 0o755)
-
-  const result = run(wrapper, [], {
-    cwd: os.tmpdir(),
-    env: deployEnv({ ALIYUN_OSS_BUCKET: 'test-bucket' }),
-  })
-
-  assert.equal(result.status, 0, result.error?.message ?? result.stderr)
-  assert.equal(readFileSync(path.join(repo, 'oss-invocation.txt'), 'utf8'), 'called')
-})
-
-test('root entry does not publish a preview branch to OSS', (t) => {
-  const { repo } = createRepository(t)
-  const wrapper = path.join(repo, 'deploy.sh')
-  const pythonScript = path.join(repo, 'scripts', 'deploy.py')
-  const ossScript = path.join(repo, 'scripts', 'deploy-oss.sh')
-  mkdirSync(path.dirname(pythonScript))
-  copyFileSync(path.join(projectRoot, 'deploy.sh'), wrapper)
-  copyFileSync(deployScript, pythonScript)
-  writeFileSync(ossScript, '#!/bin/sh\nprintf called > oss-invocation.txt\n')
-  chmodSync(wrapper, 0o755)
-  chmodSync(ossScript, 0o755)
-  git(repo, 'checkout', '-b', 'preview')
-
-  const result = run(wrapper, [], {
-    cwd: os.tmpdir(),
-    env: deployEnv({ ALIYUN_OSS_BUCKET: 'test-bucket' }),
-  })
-
-  assert.equal(result.status, 0, result.error?.message ?? result.stderr)
-  assert.match(result.stdout, /skipping OSS deployment.*preview/i)
-  assert.throws(() => readFileSync(path.join(repo, 'oss-invocation.txt'), 'utf8'))
 })
