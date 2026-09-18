@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebsiteConfiguration>
+  <IndexDocument>
+    <Suffix>index.html</Suffix>
+    <SupportSubDir>true</SupportSubDir>
+    <Type>2</Type>
+  </IndexDocument>
+  <ErrorDocument>
+    <Key>404.html</Key>
+    <HttpStatus>404</HttpStatus>
+  </ErrorDocument>
+</WebsiteConfiguration>

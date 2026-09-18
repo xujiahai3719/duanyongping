@@ -1,0 +1,25 @@
+node_modules
+.nuxt
+.output
+dist
+.data
+.env
+.env.*
+!.env.example
+.DS_Store
+npm-debug.log*
+output/
+.worktrees/
+
+# 本地工具的个人配置
+_bmad/custom/config.user.toml
+
+# 抓取的原始素材（雪球等），仅本地留存，不提交、不上线
+raw/
+
+# 字体子集化的原始 ttf（15MB），只在本地当原料，用 scripts/build-font-subset.py 重新生成
+.fontsrc/
+
+# Python
+__pycache__/
+*.pyc

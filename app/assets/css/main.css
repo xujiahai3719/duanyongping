@@ -1,0 +1,669 @@
+/* ═══════════════════════════════════════════════
+   墨韵 (Ink Charm) — Immersive Reading Design System
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --bg: #f8f5f0;
+  --bg-elevated: #ffffff;
+  --fg: #2c2c2c;
+  --muted: #777777;
+  --subtle: #777777;
+  --line: #dddddd;
+  --accent: #b5462a;
+  --accent-soft: rgba(181, 70, 42, 0.08);
+  --accent-underline: rgba(181, 70, 42, 0.25);
+  --surface: rgba(26, 24, 20, 0.03);
+  --table-bg: #ffffff;
+  --table-head: #f1e9df;
+  --table-border: #d3c6b7;
+  --table-hover: #f8f1e7;
+
+  --serif: "Crimson Pro", "Instrument Serif", Georgia, "Noto Serif SC", serif;
+  --reading: "LXGW WenKai TC", "Noto Serif SC", Georgia, serif;
+  --sans: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --max-w: 960px;
+  --px: clamp(18px, 5vw, 28px);
+  --header-h: 0px;
+  --reading-width: 1100px;
+  --article-font-scale: 100%;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  color-scheme: light;
+}
+
+html.dark {
+  --bg: #1a1a1a;
+  --bg-elevated: #222222;
+  --fg: #e5e5e5;
+  --muted: #999999;
+  --subtle: #999999;
+  --line: #333333;
+  --accent: #e07a5a;
+  --accent-soft: rgba(224, 122, 90, 0.1);
+  --accent-underline: rgba(224, 122, 90, 0.35);
+  --surface: rgba(229, 224, 216, 0.04);
+  --table-bg: #222222;
+  --table-head: #333333;
+  --table-border: #444444;
+  --table-hover: #3a3a3a;
+
+  color-scheme: dark;
+}
+
+html.green {
+  --bg: #c0edc6;
+  --bg-elevated: #d2f1d7;
+  --fg: #20231f;
+  --muted: #4d6253;
+  --subtle: #53695a;
+  --line: #8faf97;
+  --accent: #8f3d2c;
+  --accent-soft: rgba(143, 61, 44, 0.1);
+  --accent-underline: rgba(143, 61, 44, 0.3);
+  --surface: rgba(24, 34, 27, 0.05);
+  --table-bg: #d5f1da;
+  --table-head: #b4e0bc;
+  --table-border: #8faf97;
+  --table-hover: #c9ebd0;
+
+  color-scheme: light;
+}
+
+/* — 侧边栏/浮层共用令牌 —
+
+   侧边栏自己还有一层 --sb-*（见 LibrarySidebar.vue），但搜索浮层被 Teleport 到
+   body，脱离了 .sidebar 的作用域，拿不到那一层，于是 var(--sb-bg, #fff) 只能走
+   白色兜底 —— 绿色/深色主题下浮层会变成白卡片。所以基色令牌统一放在 :root，
+   由 html.dark / html.green 覆盖，任何被传送出去的浮层都能跟着主题走。 */
+
+:root,
+html.dark,
+html.green {
+  --sidebar-token-bg: var(--bg);
+  --sidebar-token-fg: var(--fg);
+  --sidebar-token-muted: color-mix(in srgb, var(--fg) 72%, var(--bg));
+  --sidebar-token-subtle: color-mix(in srgb, var(--fg) 68%, var(--bg));
+  --sidebar-token-line: var(--line);
+  --sidebar-token-surface: var(--surface);
+  --sidebar-token-accent: var(--accent);
+  --sidebar-token-accent-soft: var(--accent-soft);
+}
+
+/* — Reset & Base — */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle paper grain texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+html.dark body::before {
+  opacity: 0.04;
+}
+
+html.green body::before {
+  opacity: 0.018;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+h1, h2, h3, p {
+  overflow-wrap: anywhere;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--fg);
+}
+
+/* — Reading Progress Bar — */
+
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.reading-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 0.1s linear;
+  opacity: 0.8;
+}
+
+/* — Shared utility classes — */
+
+.eyebrow {
+  margin: 0;
+  color: var(--subtle);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section-label,
+.card-meta,
+.read-time {
+  margin: 0;
+  color: var(--subtle);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 28px;
+  border: 1px solid var(--fg);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.25s var(--ease-out);
+}
+
+.button:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.button.primary {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.button.primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.button.neutral {
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.button.neutral:hover {
+  border-color: var(--fg);
+  color: var(--fg);
+  background: transparent;
+}
+
+.content-section {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 72px var(--px);
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 36px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.text-link {
+  color: var(--subtle);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 0.2s var(--ease-out);
+}
+
+.text-link:hover {
+  color: var(--accent);
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 720px) {
+  .model-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* — Prose (ContentRenderer output) — Immersive Reading — */
+
+.prose {
+  color: var(--fg);
+  font-family: var(--reading);
+  font-size: var(--article-font-scale);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.prose h2 {
+  margin: 1.8em 0 0.4em;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 1.176em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* 带 #锚点 跳进文章时，标题上方要留出移动端吸顶栏（58px）的余地，
+   否则落点会被顶栏压住；JS 侧的 scrollToAnchor 用同样的偏移量 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  scroll-margin-top: 72px;
+}
+
+/* 跳转落点提示：标题短暂闪一下，告诉用户"就是这里" */
+@keyframes anchor-flash-in {
+  from { background-color: var(--accent-soft); }
+  to { background-color: transparent; }
+}
+
+.prose .anchor-flash {
+  animation: anchor-flash-in 1.5s var(--ease-out);
+  border-radius: 3px;
+}
+
+/* 搜索命中词的临时高亮（由 app/utils/highlightTerms.ts 包裹后撤回） */
+.prose mark.search-hit {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: var(--accent-soft);
+  box-shadow: inset 0 -1px 0 var(--accent-underline);
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose .anchor-flash {
+    animation: none;
+  }
+}
+
+.prose h3 {
+  margin: 1.4em 0 0.3em;
+  font-family: var(--sans);
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.prose h4,
+.prose h5 {
+  margin: 1.2em 0 0.3em;
+  font-family: var(--sans);
+  font-size: 0.882em;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 0.7em;
+}
+
+.prose li + li {
+  margin-top: 6px;
+}
+
+.prose blockquote {
+  margin: 1em 0;
+  padding: 0.6em 1em;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  font-size: 0.941em;
+  line-height: 1.7;
+  color: var(--muted);
+  border-radius: 0 4px 4px 0;
+}
+
+.prose blockquote p {
+  margin: 0 0 0.5em;
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose hr {
+  margin: 48px auto;
+  border: none;
+  width: 48px;
+  height: 1px;
+  background: var(--line);
+}
+
+.prose a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-underline);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.2s;
+}
+
+.prose a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.prose table {
+  width: 100%;
+  max-width: 100%;
+  margin: 1em 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+  font-family: var(--sans);
+  font-size: 0.941em;
+  line-height: 1.6;
+  background: var(--table-bg);
+  border: 1px solid var(--table-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.prose th,
+.prose td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-right: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+}
+
+.prose th:last-child,
+.prose td:last-child {
+  border-right: none;
+}
+
+.prose tr:last-child td {
+  border-bottom: none;
+}
+
+.prose th {
+  background: var(--table-head);
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.prose tbody tr {
+  transition: background 0.15s ease;
+}
+
+.prose tbody tr:hover {
+  background: var(--table-hover);
+}
+
+.prose code {
+  padding: 2px 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  margin: 1em 0;
+  padding: 16px 20px;
+  background: #282c34;
+  color: #abb2bf;
+  border-radius: 6px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.prose pre code {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: inherit;
+  font-size: 0.824em;
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose > *:last-child {
+  margin-bottom: 0;
+}
+
+.related-block h2 {
+  margin: 0 0 24px;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* — Page entrance animation — */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter-active {
+  animation: fadeInUp 0.5s var(--ease-out) both;
+}
+
+/* — Responsive — */
+
+@media (min-width: 721px) {
+  :root {
+    --px: clamp(28px, 4vw, 44px);
+  }
+}
+
+@media (min-width: 1025px) {
+  :root {
+    --px: clamp(32px, 5vw, 56px);
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --header-h: 0px;
+  }
+
+  .content-section {
+    padding: 48px var(--px);
+  }
+
+  .prose {
+    line-height: 1.75;
+  }
+
+  .prose h2 {
+    margin-top: 1.55em;
+    font-size: 1.1875em;
+  }
+
+  .prose h3 {
+    font-size: 1em;
+  }
+
+  .prose ul,
+  .prose ol {
+    padding-left: 1.25em;
+  }
+
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.875em;
+  }
+
+  .prose th,
+  .prose td {
+    padding: 8px 10px;
+  }
+
+  .prose blockquote {
+    padding: 0.5em 1em;
+    font-size: 1em;
+  }
+
+  .prose hr {
+    margin: 36px auto;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   Twikoo 评论区主题适配
+   站点用手动 .dark class 切换，而 Twikoo 默认按
+   prefers-color-scheme 判深浅。这里用 #tcomment 的
+   id 特异性覆盖 Twikoo / Element Plus 默认色，全部
+   引用站点 CSS 变量——变量已随 html.dark 翻转，故
+   一套规则即可同时适配深浅两种主题。
+   ─────────────────────────────────────────────── */
+#tcomment {
+  color: var(--fg);
+  font-family: var(--sans, inherit);
+}
+
+#tcomment a {
+  color: var(--accent);
+}
+
+#tcomment .tk-nick,
+#tcomment .tk-content,
+#tcomment .tk-content p {
+  color: var(--fg);
+}
+
+#tcomment .tk-meta,
+#tcomment .tk-time,
+#tcomment .tk-tag,
+#tcomment .tk-comments-title,
+#tcomment .tk-icon {
+  color: var(--muted) !important;
+}
+
+/* 输入框 / 文本域（Element Plus） */
+#tcomment .el-input__inner,
+#tcomment .el-textarea__inner {
+  background-color: var(--bg-elevated) !important;
+  color: var(--fg) !important;
+  border-color: var(--line) !important;
+}
+
+#tcomment .el-input__inner::placeholder,
+#tcomment .el-textarea__inner::placeholder {
+  color: var(--subtle) !important;
+}
+
+#tcomment .el-textarea__inner:focus,
+#tcomment .el-input__inner:focus {
+  border-color: var(--accent) !important;
+}
+
+/* 提交按钮 */
+#tcomment .tk-submit .el-button--primary,
+#tcomment .el-button--primary {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+/* 分隔线 / 边框 */
+#tcomment .tk-comment,
+#tcomment .tk-replies,
+#tcomment hr,
+#tcomment .OwO-body {
+  border-color: var(--line) !important;
+}
+
+/* 表情面板 / 弹层背景 */
+#tcomment .OwO-body,
+#tcomment .tk-meta-input {
+  background-color: var(--bg-elevated) !important;
+}
