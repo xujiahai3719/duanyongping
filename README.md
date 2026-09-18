@@ -1,6 +1,10 @@
 # 大道总纲 · 段永平投资问答录知识库
 
-整理段永平公开投资问答、访谈与经营理念的中文资料站，提供分类阅读、全文搜索、章节导航和阅读位置恢复。
+整理段永平公开投资问答、访谈与经营理念的中文知识库网站，提供分类阅读、全文搜索、章节导航和阅读位置恢复。
+
+在线访问：[大道总纲 · 段永平投资问答录](https://duan.ayaseeri.com/)
+
+[![大道总纲知识库网站首页预览](./docs/images/site-preview.png)](https://duan.ayaseeri.com/)
 
 使用 Nuxt 4、Vue 3、Nuxt Content v3，将 Markdown 内容预渲染为静态站点。源码仓库为 [Esdeath/website_dao](https://github.com/Esdeath/website_dao)，发布目录为 `.output/public`。
 
