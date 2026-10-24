@@ -1,0 +1,9 @@
+{
+  "name": "duanyongping",
+  "installCommand": "npm install",
+  "buildCommand": "SKIP_DEPLOY=1 npm run generate",
+  "assets": {
+    "directory": "./.output/public",
+    "notFoundStrategy": "404Page"
+  }
+}
