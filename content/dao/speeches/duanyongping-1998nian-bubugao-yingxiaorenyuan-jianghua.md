@@ -1,10 +1,10 @@
 ---
-title: "1998年段永平对步步高所有营销人员的讲话"
+title: "1998年段永平对步步高所有营销人员的讲话徐家海"
 slug: "duanyongping-1998nian-bubugao-yingxiaorenyuan-jianghua"
 description: "段永平面向步步高营销人员阐述本分、信誉、聚焦、敢为天下后与不攻击对手等经营原则。"
 category: "访谈实录"
 order: 98
-seoTitle: "1998年段永平对步步高所有营销人员的讲话｜段永平投资问答录"
+seoTitle: "19   98年段永平对步步高所有营销人员的讲话｜段永平投资问答录"
 seoDescription: "段永平面向步步高营销人员阐述本分、信誉、聚焦、敢为天下后与不攻击对手等经营原则。"
 ---
 
